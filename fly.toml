@@ -1,0 +1,22 @@
+app = "mandelbrot-stream"  # This should match your app name on Fly.io
+
+[build]
+  # Nixpacks will auto-detect the Node.js environment, no need for a custom Dockerfile
+  builder = "heroku/buildpacks:nodejs"
+  hooks = ["apt-get update && apt-get install -y ffmpeg"]  # Install FFmpeg
+
+[env]
+  FFMPEG_PATH = "/usr/bin/ffmpeg"  # Path to FFmpeg in the Fly.io environment
+
+[[services]]
+  internal_port = 3000  # The port your app listens on
+  protocol = "tcp"
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]  # Use HTTP for web traffic (for optional HTTP requests)
